@@ -4,7 +4,7 @@
 *  Program: morand.buildrooms.c
 *  Date: 2/13/2018
 *  Description: Builds room files for adventure game incorporating
-*				file reading and writing, threading, and mutexes.
+*		file reading and writing, threading, and mutexes.
 *
 ************************************************************************/
 #include <stdio.h>
@@ -24,14 +24,14 @@
 
 
 /***********************************************************************
-*  Structure:			    room
-*  Description:  			Information for graph of rooms
-*		name:  				name of room
-*		numConnections: 	number of rooms connected to this room
-*		count:				count of
-*		roomID:				room ID for non-string room identification
-*		roomType:  			type of room (START_ROOM, MID_ROOM, END_ROOM)
-*		connectedRooms:		array of pointers to connected room structures
+*  Structure:		room
+*  Description:  	Information for graph of rooms
+*  name:  		name of room
+*  numConnections: 	number of rooms connected to this room
+*  count:		count of rooms
+*  roomID:		room ID for non-string room identification
+*  roomType:  		type of room (START_ROOM, MID_ROOM, END_ROOM)
+*  connectedRooms:	array of pointers to connected room structures
 ************************************************************************/
 struct room
 {
@@ -45,14 +45,15 @@ struct room
 
 
 /***********************************************************************
-*  Function: 			initializeRooms()
-*  Description:			Sets myRoom struct to 0/NULL
-*  Parameters:   		None
-*  Pre-conditions:		myRoom struct memory allocated
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		initializeRooms()
+*  Description:		Sets myRoom struct to 0/NULL
+*  Parameters:  	None
+*  Pre-conditions:	myRoom struct memory allocated
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
-void initializeRooms(){
+void initializeRooms()
+{
 	int i, j, k;
 	for (i = 0; i < MAX_ROOMS; i++){
 		myRooms[i].name = calloc(16, sizeof(char));
@@ -72,14 +73,15 @@ void initializeRooms(){
 
 
 /***********************************************************************
-*  Function: 			randomNumberGenerator()
-*  Description:			generates array of random numbers
-*  Parameters:   		number of random numbers to generate
-*  Pre-conditions:		size of array to generate
-*  Post-conditions:		None
-*  Return:				array of random numbers
+*  Function: 		randomNumberGenerator()
+*  Description:		generates array of random numbers
+*  Parameters:  	number of random numbers to generate
+*  Pre-condition:	size of array to generate
+*  Post-conditions:	None
+*  Return:		array of random numbers
 ************************************************************************/
-int * randomNumberGenerator(int size){
+int * randomNumberGenerator(int size)
+{
 	int i, j;
 	int ranlist[size];
 	int ranNum;
@@ -115,13 +117,13 @@ int * randomNumberGenerator(int size){
 
 
 /***********************************************************************
-*  Function: 			assignRandomRoomNames()
-*  Description:			Generates array of unique random numbers to
-*						assign random room names
-*  Parameters:   		Pointers to hardcoded room names
-*  Pre-conditions:		hardcoded room names created
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		assignRandomRoomNames()
+*  Description:		Generates array of unique random numbers to
+*			assign random room names
+*  Parameters:   	Pointers to hardcoded room names
+*  Pre-conditions:	hardcoded room names created
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 static void assignRandomRoomNames(char **rmNames)
 {
@@ -136,13 +138,13 @@ static void assignRandomRoomNames(char **rmNames)
 
 
 /***********************************************************************
-*  Function: 			assignRandomRoomTypes()
-*  Description:			Generate an array of unique random numbers
-*						and assign random room types
-*  Parameters:   		Pointers to hardcoded room types
-*  Pre-conditions:		myRoom struct memory set aside
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		assignRandomRoomTypes()
+*  Description:		Generate an array of unique random numbers
+*			and assign random room types
+*  Parameters:   	Pointers to hardcoded room types
+*  Pre-conditions:	myRoom struct memory set aside
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 static void assignRandomRoomTypes(char ** rmTypes)
 {
@@ -164,12 +166,12 @@ static void assignRandomRoomTypes(char ** rmTypes)
 }
 
 /***********************************************************************
-*  Function: 			assignRandomNumRoomConnections()
-*  Description:			Assigns random number of room connections
-*  Parameters:   		None
-*  Pre-conditions:		myRoom struct memory set aside
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		assignRandomNumRoomConnections()
+*  Description:		Assigns random number of room connections
+*  Parameters:   	None
+*  Pre-conditions:	myRoom struct memory set aside
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 void assignRandomNumRoomConnections(){
 	// Generate list of random numbers for # room connections
@@ -188,12 +190,12 @@ void assignRandomNumRoomConnections(){
 
 
 /***********************************************************************
-*  Function: 			assignRandomRoomConnections()
-*  Description:			Assigns random room connections
-*  Parameters:   		None
-*  Pre-conditions:		myRoom struct memory set aside
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		assignRandomRoomConnections()
+*  Description:		Assigns random room connections
+*  Parameters:   	None
+*  Pre-conditions:	myRoom struct memory set aside
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 void assignRandomRoomConnections()
 {
@@ -228,12 +230,12 @@ void assignRandomRoomConnections()
 }
 
 /***********************************************************************
-*  Function: 			createRoomFiles()
-*  Description:			Creates room files and writes info to for game play
-*  Parameters:   		pointers to hardcoded file names
-*  Pre-conditions:		myRooms struct memory set aside
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		createRoomFiles()
+*  Description:		Creates room files and writes info to for game play
+*  Parameters:   	pointers to hardcoded file names
+*  Pre-conditions:	myRooms struct memory set aside
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 void createRoomFiles(char ** flNames){
 	int i, j, k;
@@ -273,9 +275,9 @@ void createRoomFiles(char ** flNames){
 *************************************************************************
 *************************************************************************
 *************************************************************************
-***********													  ***********
-****						  MAIN() 								  ***
-***********													  ***********
+***********			       			      ***********
+****				  MAIN()		  	      ***
+***********						      ***********
 *************************************************************************
 *************************************************************************
 *************************************************************************

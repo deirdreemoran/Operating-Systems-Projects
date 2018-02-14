@@ -4,7 +4,7 @@
 *  Program: morand.adventure.c
 *  Date: 2/13/2018
 *  Description: Adventure game incorporating file reading
-*   			and writing, threading, and mutexes.
+*		and writing, threading, and mutexes.
 *
 ************************************************************************/
 
@@ -39,12 +39,12 @@ char myFileArray[MAX_ROOMS][MAX_CHARS];
 
 
 /***********************************************************************
-*  Structure:			    room
-*  Description:  			Information for graph of rooms
-*		name:  				name of room
-*		numConnections: 	number of rooms connected to this room
-*		roomType:  			type of room (START_ROOM, MID_ROOM, END_ROOM)
-*		connectedRooms:		array of pointers to connected room structures
+*  Structure:		room
+*  Description:  	Information for graph of rooms
+*  name:  		name of room
+*  numConnections: 	number of rooms connected to this room
+*  roomType:  		type of room (START_ROOM, MID_ROOM, END_ROOM)
+*  connectedRooms:	array of pointers to connected room structures
 ************************************************************************/
 struct room
 {
@@ -55,12 +55,12 @@ struct room
 } myRooms[MAX_ROOMS];  // array of accessible room structures
 
 /***********************************************************************
-*  Structure: 				visited
-*  Description:  			Structure to hold current game state
-*		currentRoom:  		index to reference array of room structures
-*		numConnections: 	number of rooms connected to this room
-*		stepCount:  		counter for number of steps/rooms visited
-*		stepRooms:			array of pointers to visited room structures
+*  Structure: 		visited
+*  Description:  	Structure to hold current game state
+*  currentRoom:  	index to reference array of room structures
+*  numConnections: 	number of rooms connected to this room
+*  stepCount:  		counter for number of steps/rooms visited
+*  stepRooms:		array of pointers to visited room structures
 ************************************************************************/
 struct visited
 {
@@ -70,12 +70,12 @@ struct visited
 } visitedRooms[1];
 
 /***********************************************************************
-*  Function: 			whereToPrompt()
-*  Description:  		Prints prompt for user entry, gets next command.
-*  Parameters:   		Buffer for userEntry (room name or "time")
-*  Pre-conditions:		Buffer is empty
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		whereToPrompt()
+*  Description:  	Prints prompt for user entry, gets next command.
+*  Parameters:   	Buffer for userEntry (room name or "time")
+*  Pre-conditions:	Buffer is empty
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 void whereToPrompt(char * userEntry)
 {
@@ -86,13 +86,14 @@ void whereToPrompt(char * userEntry)
 		scanf("%s", userEntry);
 }
 
+
 /***********************************************************************
-*  Function: 			printPossibleConnections()
-*  Description:  		Prints rooms connected to current room
-*  Parameters:   		Buffer to print connecting rooms, userEntry buffer
-*  Pre-conditions:		Buffers are empty, rooms are connected
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		printPossibleConnections()
+*  Description:  	Prints rooms connected to current room
+*  Parameters:   	Buffer to print connecting rooms, userEntry buffer
+*  Pre-conditions:	Buffers are empty, rooms are connected
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 void printPossibleConnections(char * possibleConnections, char * userEntry)
 {
@@ -118,16 +119,18 @@ void printPossibleConnections(char * possibleConnections, char * userEntry)
 		whereToPrompt(userEntry);
 }
 
+
 /***********************************************************************
-*  Function: 			compareEntry()
-*  Description:  		Invokes game action based on userEntry
-*  Parameters:   		User input, empty userEntry2 buffer
-*  Pre-conditions:		Buffers are empty, rooms are connected
-*  Post-conditions:		None
-*  Return:				Returns True (0) if game has ended,
-*						otherwise False(1)
+*  Function: 		compareEntry()
+*  Description:  	Invokes game action based on userEntry
+*  Parameters:   	User input, empty userEntry2 buffer
+*  Pre-conditions:	Buffers are empty, rooms are connected
+*  Post-conditions:	None
+*  Return:		Returns True (0) if game has ended,
+*			otherwise False(1)
 ************************************************************************/
-int compareEntry(char * userEntry, char * userEntry2){
+int compareEntry(char * userEntry, char * userEntry2)
+{
 		char buffer[256];
 		int currentRoom = visitedRooms[0].currentRoom;
 
@@ -154,7 +157,7 @@ int compareEntry(char * userEntry, char * userEntry2){
 			memset(userEntry, '\0', sizeof(userEntry));
 			memset(userEntry2, '\0', sizeof(userEntry2));
 			memset(buffer, '\0', sizeof(buffer));
-			printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
+			printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n");
 			return 1;
 		}
 
@@ -192,13 +195,14 @@ int compareEntry(char * userEntry, char * userEntry2){
 		}
 }
 
+
 /***********************************************************************
-*  Function: 			getTime()
-*  Description:  		Writes current time to file using separate thread
-*  Parameters:   		void pointer
-*  Pre-conditions:		Thread created, mutex locked
-*  Post-conditions:		None
-*  Return:				void pointer set to NULL
+*  Function: 		getTime()
+*  Description:  	Writes current time to file using separate thread
+*  Parameters:   	void pointer
+*  Pre-conditions:	Thread created, mutex locked
+*  Post-conditions:	None
+*  Return:		void pointer set to NULL
 ************************************************************************/
 void * getTime(void * passed_in_value)
 {
@@ -232,13 +236,14 @@ void * getTime(void * passed_in_value)
 		return(NULL);
 }
 
+
 /***********************************************************************
-*  Function: 			initializeMutex()
-*  Description:			locks the main and secondary threads
-*  Parameters:   		None
-*  Pre-conditions:		global mutex and pthreads created
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		initializeMutex()
+*  Description:		locks the main and secondary threads
+*  Parameters:   	None
+*  Pre-conditions:	global mutex and pthreads created
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 void initializeMutex()
 {
@@ -250,15 +255,17 @@ void initializeMutex()
 		pthread_create(&(tid[0]), NULL, &getTime, (void*)NULL);
 }
 
+
 /***********************************************************************
-*  Function: 			initializeRooms()
-*  Description:			Sets myRoom and visitedRoom structs to 0/NULL
-*  Parameters:   		None
-*  Pre-conditions:		myRoom and visitedRoom struct memory set aside
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		initializeRooms()
+*  Description:		Sets myRoom and visitedRoom structs to 0/NULL
+*  Parameters:   	None
+*  Pre-conditions:	myRoom and visitedRoom struct memory set aside
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
-void initializeRooms(){
+void initializeRooms()
+{
 	int i, j, k;
 	// set all structure variables to null
 	for (i = 0; i < MAX_ROOMS_VISITED; i++){
@@ -278,15 +285,16 @@ void initializeRooms(){
 
 
 /***********************************************************************
-*  Function: 			getMostRecentDir()
-*  Description:			Gets the most recently created directory of rooms
-*  Parameters:   		String to hold room directory name,
-*						struct to read directory info into
-*  Pre-conditions:		morand.buildrooms.c compilation and execution
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		getMostRecentDir()
+*  Description:		Gets the most recently created directory of rooms
+*  Parameters:   	String to hold room directory name,
+*			struct to read directory info into
+*  Pre-conditions:	morand.buildrooms.c compilation and execution
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
-void getMostRecentDir(char * myRoomDir, struct dirent * ent){
+void getMostRecentDir(char * myRoomDir, struct dirent * ent)
+{
 	int mostRecentDir;
 	mostRecentDir = 0;
 	struct stat dirStats;
@@ -313,12 +321,12 @@ void getMostRecentDir(char * myRoomDir, struct dirent * ent){
 
 
 /***********************************************************************
-*  Function: 			createRooms()
-*  Description:			Creates rooms for game play
-*  Parameters:   		C string containing current directory
-*  Pre-conditions:		Current directory is open
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		createRooms()
+*  Description:		Creates rooms for game play
+*  Parameters:   	C string containing current directory
+*  Pre-conditions:	Current directory is open
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 void createRooms(char * myRoomDir){
 	int i;
@@ -376,12 +384,12 @@ void createRooms(char * myRoomDir){
 }
 
 /***********************************************************************
-*  Function: 			addConnections()
-*  Description:			adds connections to rooms
-*  Parameters:   		C string for current directory
-*  Pre-conditions:	 	compilation and execution of morand.buildrooms.c
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		addConnections()
+*  Description:		adds connections to rooms
+*  Parameters:   	C string for current directory
+*  Pre-conditions:	compilation and execution of morand.buildrooms.c
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
 
 void addConnections(char * myRoomDir)
@@ -401,56 +409,58 @@ void addConnections(char * myRoomDir)
 	int roomCounter = 0;
 	// for each file in the directory, get the file name and store in result
 	for(index = 0; index < MAX_ROOMS; index++){
-			memset(result, '\0', sizeof(result));
-			strcat(result, "./");
-			strcat(result, myRoomDir);
-			strcat(result, "/");
-			strcat(result, myFileArray[index]);
-			// open file
-			if(	myFile = fopen(result, "r"))
+		memset(result, '\0', sizeof(result));
+		strcat(result, "./");
+		strcat(result, myRoomDir);
+		strcat(result, "/");
+		strcat(result, myFileArray[index]);
+		// open file
+		if(	myFile = fopen(result, "r"))
+		{
+			while(fgets(line, sizeof(line), myFile) != NULL)
 			{
-				while(fgets(line, sizeof(line), myFile) != NULL)
-				{
-					// clear parsing variables
-					memset(thirdArg, '\0', sizeof(thirdArg));
-					memset(secondArg, '\0', sizeof(secondArg));
-					memset(firstArg, '\0', sizeof(firstArg));
-					// read the line and store contents in parser variables
-					sscanf(line, "%s %s %s", firstArg, secondArg, thirdArg);
-					// create connections
-					if(strcmp(firstArg, "CONNECTION") == 0){
-						//get struct from room name in thirdArg
-						for (i = 0; i < MAX_ROOMS; i++){
-							if (strcmp(thirdArg, myRooms[i].name) == 0){
-								myRooms[index].connectedRooms[myRooms[index].numConnections] = &myRooms[i];
-							}
+				// clear parsing variables
+				memset(thirdArg, '\0', sizeof(thirdArg));
+				memset(secondArg, '\0', sizeof(secondArg));
+				memset(firstArg, '\0', sizeof(firstArg));
+				// read the line and store contents in parser variables
+				sscanf(line, "%s %s %s", firstArg, secondArg, thirdArg);
+				// create connections
+				if(strcmp(firstArg, "CONNECTION") == 0){
+					//get struct from room name in thirdArg
+					for (i = 0; i < MAX_ROOMS; i++){
+						if (strcmp(thirdArg, myRooms[i].name) == 0){
+							myRooms[index].connectedRooms[myRooms[index].numConnections] = &myRooms[i];
 						}
-						myRooms[index].numConnections++;
 					}
-				}//end of while line loop
-			}//end of file loop, close file
-			fclose(myFile);
+					myRooms[index].numConnections++;
+				}
+			}//end of while line loop
+		}//end of file loop, close file
+		fclose(myFile);
 	}//end of for loop
 }
 
+
 /***********************************************************************
-*  Function: 			timeThread()
-*  Description:			unlocks mutex to execute call to getTime()
-*  Parameters:   		None
-*  Pre-conditions:		pthread created in main for call to getTime,
-*						main thread is locked
-*  Post-conditions:		None
-*  Return:				None
+*  Function: 		timeThread()
+*  Description:		unlocks mutex to execute call to getTime()
+*  Parameters:   	None
+*  Pre-conditions:	pthread created in main for call to getTime,
+*			main thread is locked
+*  Post-conditions:	None
+*  Return:		None
 ************************************************************************/
-void timeThread(){
-		// unlock mutex to activate 2nd thread call to getTime
-		pthread_mutex_unlock(&mutex);
-		// return to main thread, end 2nd thread
-		pthread_join(tid[0], NULL);
-		// lock mutex for main thread
-		pthread_mutex_lock(&mutex);
-		// recreate 2nd thread for subsequent "time" requests
-		pthread_create(&(tid[0]), NULL, &getTime, NULL);
+void timeThread()
+{
+	// unlock mutex to activate 2nd thread call to getTime
+	pthread_mutex_unlock(&mutex);
+	// return to main thread, end 2nd thread
+	pthread_join(tid[0], NULL);
+	// lock mutex for main thread
+	pthread_mutex_lock(&mutex);
+	// recreate 2nd thread for subsequent "time" requests
+	pthread_create(&(tid[0]), NULL, &getTime, NULL);
 }
 
 
@@ -459,9 +469,9 @@ void timeThread(){
 *************************************************************************
 *************************************************************************
 *************************************************************************
-***********													  ***********
-****						  MAIN() 								  ***
-***********													  ***********
+***********						      ***********
+****				MAIN() 		                      ***
+***********						      ***********
 *************************************************************************
 *************************************************************************
 *************************************************************************
@@ -485,7 +495,7 @@ int main()
 	if (myDir){
 		readdir(myDir);
 		while((ent = readdir(myDir)) != NULL){
-			//omit files that
+			//omit objects directory and parent directory
 				if(ent->d_name[0] != '.'){
 					strcpy(myFileArray[mfaCount], ent->d_name);
 					mfaCount++;
