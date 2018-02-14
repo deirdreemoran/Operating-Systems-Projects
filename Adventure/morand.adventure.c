@@ -2,9 +2,8 @@
 *
 *  Author: Deirdre Moran
 *  Program: morand.adventure.c
-*  Course: CS344
 *  Date: 2/13/2018
-*  Description: Adventure game program incorporating file reading
+*  Description: Adventure game incorporating file reading
 *   			and writing, threading, and mutexes.
 *
 ************************************************************************/
@@ -36,11 +35,10 @@
 // Global variables for POSIX thread and mutex
 pthread_t tid[1];
 pthread_mutex_t mutex;
-
+char myFileArray[MAX_ROOMS][MAX_CHARS];
 /***********************************************************************
-*  Structure: room
-*  Description:  Information for graph of rooms
-*
+*  Structure:			    room
+*  Description:  			Information for graph of rooms
 *		name:  				name of room
 *		numConnections: 	number of rooms connected to this room
 *		roomType:  			type of room (START_ROOM, MID_ROOM, END_ROOM)
@@ -52,25 +50,25 @@ struct room
 	int numConnections;
 	char roomType[MAX_CHARS];
 	struct room * connectedRooms[MAX_CONNECTIONS];
-}myRooms[MAX_ROOMS];  // array of accessible room structures
+} myRooms[MAX_ROOMS];  // array of accessible room structures
 
 /***********************************************************************
-*  Structure: visited
-*  Description:  Structure to hold current game state
-*
-*		currentRoom:  		index to reference element in array of room structures
+*  Structure: 				visited
+*  Description:  			Structure to hold current game state
+*		currentRoom:  		index to reference array of room structures
 *		numConnections: 	number of rooms connected to this room
 *		stepCount:  		counter for number of steps/rooms visited
 *		stepRooms:			array of pointers to visited room structures
 ************************************************************************/
-struct visited{
+struct visited
+{
 	int currentRoom;
 	int stepCount;
 	struct room * stepRooms[MAX_CHARS];
 } visitedRooms[1];
 
 /***********************************************************************
-*  Function: whereToPrompt()
+*  Function: 			whereToPrompt()
 *  Description:  		Prints prompt for user entry, gets next command.
 *  Parameters:   		Buffer for userEntry (room name or "time")
 *  Pre-conditions:		Buffer is empty
@@ -87,7 +85,7 @@ void whereToPrompt(char * userEntry)
 }
 
 /***********************************************************************
-*  Function: printPossibleConnections()
+*  Function: 			printPossibleConnections()
 *  Description:  		Prints rooms connected to current room
 *  Parameters:   		Buffer to print connecting rooms, userEntry buffer
 *  Pre-conditions:		Buffers are empty, rooms are connected
@@ -119,7 +117,7 @@ void printPossibleConnections(char * possibleConnections, char * userEntry)
 }
 
 /***********************************************************************
-*  Function: compareEntry()
+*  Function: 			compareEntry()
 *  Description:  		Invokes game action based on userEntry
 *  Parameters:   		User input, empty userEntry2 buffer
 *  Pre-conditions:		Buffers are empty, rooms are connected
@@ -179,7 +177,7 @@ int compareEntry(char * userEntry, char * userEntry2){
 		}
 
 		// If user newCurrentRoom IS the end room, display congratulation message and print
-		// number of steps and rooms visited
+		// number of steps and rooms visited, return to main with gameOver set to True
 		if (strcmp(myRooms[newCurrentRoom].roomType, "END_ROOM") == 0){
 			visitedRooms[0].stepRooms[visitedRooms[0].stepCount] = &myRooms[newCurrentRoom];
 			visitedRooms[0].stepCount++;
@@ -190,106 +188,232 @@ int compareEntry(char * userEntry, char * userEntry2){
 			}
 			return 0;
 		}
-			//return 0;
+}
 
+/***********************************************************************
+*  Function: 			getTime()
+*  Description:  		Writes current time to file using separate thread
+*  Parameters:   		void pointer
+*  Pre-conditions:		Thread created, mutex locked
+*  Post-conditions:		None
+*  Return:				None
+************************************************************************/
+void * getTime(void * passed_in_value)
+{
+		// lock the mutex in current thread
+		pthread_mutex_lock(&mutex);
 
+		// empty buffer and create filepath for writing time
+		char buffer[MAX_CHARS];
+		memset(buffer,'\0', sizeof(buffer));
+		FILE * timeFP;
+		char fileName[MAX_FILEPATH];
+		memset(fileName, '\0', sizeof(fileName));
+		strcpy(fileName, "time.txt");
+
+		// get the current time and store in structure
+		time_t currentTime;
+		struct tm * info;
+		time(&currentTime);
+		info = localtime(&currentTime);
+		// write formatted time to buffer
+		strftime(buffer, MAX_CHARS, "%l:%M%P %A, %B %d, %Y", info);
+
+		// open file to write to
+		timeFP = fopen(fileName, "w");
+		// print time to file
+		fprintf(timeFP,"%s\n", buffer);
+		// close file
+		fclose(timeFP);
+		// Unlock the mutex
+		pthread_mutex_unlock(&mutex);
+		return(NULL);
 }
 
 
-void * getTime(void * passed_in_value){
-	//	pthread_mutex_lock(mutex);
-	pthread_mutex_lock(&mutex);
-	FILE * timeFP1;
-	char buffer1[80];
-	int result_code;
-	int pid = pthread_self();
-	char buffer[80];
-    time_t currentTime;
-    struct tm * info;
-    FILE * timeFP;
-	char fileName[MAX_FILEPATH];
-	memset(fileName, '\0', sizeof(fileName));
-	strcpy(fileName, "time.txt");
-    memset(buffer,'\0', sizeof(buffer));
-	// get current time
-    time(&currentTime);
-    info = localtime(&currentTime);
-	strftime(buffer, 80, "%l:%M%P %A, %B %d, %Y", info);
-	// open file to write to
-    timeFP = fopen(fileName, "w");
-    // print time to file
-    fprintf(timeFP,"%s\n", buffer);
-    // close file
-    fclose(timeFP);
-    //pthread_mutex_destroy(&mutex);
-  	pthread_mutex_unlock(&mutex);
-   	return(NULL);
 
+
+void initializeMutex()
+{
+		// initialize mutex
+		pthread_mutex_init(&mutex, NULL);
+		// lock mutex in main thread
+		pthread_mutex_lock(&mutex);
+		// create POSIX thread, will execute when mutex is unlocked
+		pthread_create(&(tid[0]), NULL, &getTime, (void*)NULL);
 }
 
 
-int main(){
-	// initialize mutex
-	pthread_mutex_init(&mutex, NULL);
-	// lock the mutex
-	//	pthread_mutex_lock(mutex);
-	pthread_mutex_lock(&mutex);
-	// create thread to later unlock and Call getTime and create POSIX thread
-	// is blocked until we call unlock on mutex
-	pthread_create(&(tid[0]), NULL, &getTime, (void*)NULL);
+void initializeRooms(){
+		int i, j, k;
+			for (i = 0; i < MAX_ROOMS_VISITED; i++){
+				visitedRooms[0].stepRooms[i] = NULL;
+			}
+					visitedRooms[0].stepCount = 0;
+			for (i = 0; i < MAX_ROOMS; i++){
 
+					myRooms[i].numConnections = 0;
+					memset(myRooms[i].name, '\0', sizeof(myRooms[i].name));
+					memset(myRooms[i].roomType, '\0', sizeof(myRooms[i].roomType));
 
-	char myDirInfo;
-	int mostRecentDir;
-	mostRecentDir = 0;
-	int i, j, k;
-	for (i = 0; i < MAX_ROOMS_VISITED; i++){
-		visitedRooms[0].stepRooms[i] = NULL;
-	}
-			visitedRooms[0].stepCount = 0;
-	for (i = 0; i < MAX_ROOMS; i++){
-
-			myRooms[i].numConnections = 0;
-			memset(myRooms[i].name, '\0', sizeof(myRooms[i].name));
-			memset(myRooms[i].roomType, '\0', sizeof(myRooms[i].roomType));
-
-	}
-	for(i = 0; i < MAX_ROOMS; i++){
-		for(j = 0; j < MAX_CONNECTIONS; j++){
-			myRooms[i].connectedRooms[j] = NULL;
-		}
-	}
-
-	char myRoomDir[50];
-	memset(myRoomDir, '\0', sizeof(myRoomDir));
-	struct stat dirStats;
-	DIR * dir;
-	struct dirent * ent;
-	if (dir = opendir("./")){
-		while ((ent = readdir(dir)) != NULL){
-			if(strstr(ent->d_name, "morand.rooms") != NULL){
-				stat(ent->d_name, &dirStats);
-				if(((int)dirStats.st_mtime) > mostRecentDir){
-					mostRecentDir = (int) dirStats.st_mtime;
-					strcpy(myRoomDir, ent->d_name);
+			}
+			for(i = 0; i < MAX_ROOMS; i++){
+				for(j = 0; j < MAX_CONNECTIONS; j++){
+					myRooms[i].connectedRooms[j] = NULL;
 				}
 			}
-		}
+
+}
+
+void getMostRecentDir(char * myRoomDir, struct dirent * ent){
+	int mostRecentDir;
+	mostRecentDir = 0;
+	struct stat dirStats;
+		DIR * dir;
+		if (dir = opendir("./")){
+			while ((ent = readdir(dir)) != NULL){
+				if(strstr(ent->d_name, "morand.rooms") != NULL){
+					stat(ent->d_name, &dirStats);
+					if(((int)dirStats.st_mtime) > mostRecentDir){
+						mostRecentDir = (int) dirStats.st_mtime;
+						strcpy(myRoomDir, ent->d_name);
+					}
+				}
+			}
 	}
+}
+
+
+
+void createRooms(char * myRoomDir){
+	int i;
+	FILE * myFile;
+			char line[100];
+			int index;
+			char result[MAX_FILEPATH];
+
+			char firstArg[20];
+			char secondArg[20];
+			char thirdArg[20];
+			char roomArray[7][20];
+			int roomCounter = 0;
+			// for each file in the directory
+			for(index = 0; index < MAX_ROOMS; index++){
+				memset(result, '\0', sizeof(result));
+				strcat(result, "./");
+				strcat(result, myRoomDir);
+				strcat(result, "/");
+				strcat(result, myFileArray[index]);
+
+				if(	myFile = fopen(result, "r"))
+				{
+					while(fgets(line, sizeof(line), myFile) != NULL)
+					{
+						memset(thirdArg, '\0', sizeof(thirdArg));
+						memset(secondArg, '\0', sizeof(secondArg));
+						memset(firstArg, '\0', sizeof(firstArg));
+
+						sscanf(line, "%s %s %s", firstArg, secondArg, thirdArg);
+
+					//	arg = *thirdArg;
+						if (strcmp(secondArg, "NAME:") == 0){
+							//create room
+							strcpy(myRooms[roomCounter].name, thirdArg);
+							//add to room array
+							fflush(stdout);
+							roomCounter++;
+						}
+						if (strcmp(secondArg, "TYPE:") == 0){
+							strcpy(myRooms[index].roomType, thirdArg);
+							if(strcmp(thirdArg, "START_ROOM") == 0){
+								visitedRooms[0].currentRoom = index;
+							}
+						}
+
+					}
+				}
+				fclose(myFile);
+				//free(result);
+
+		}
+
+		for(index = 0; index < MAX_ROOMS; index++){
+					memset(result, '\0', sizeof(result));
+					strcat(result, "./");
+					strcat(result, myRoomDir);
+					strcat(result, "/");
+					strcat(result, myFileArray[index]);
+
+					if(	myFile = fopen(result, "r"))
+					{
+						while(fgets(line, sizeof(line), myFile) != NULL)
+						{
+							memset(thirdArg, '\0', sizeof(thirdArg));
+							memset(secondArg, '\0', sizeof(secondArg));
+							memset(firstArg, '\0', sizeof(firstArg));
+
+							sscanf(line, "%s %s %s", firstArg, secondArg, thirdArg);
+							if(strcmp(firstArg, "CONNECTION") == 0){
+								//get struct from room name in thirdArg
+								for (i = 0; i < MAX_ROOMS; i++){
+									if (strcmp(thirdArg, myRooms[i].name) == 0){
+										myRooms[index].connectedRooms[myRooms[index].numConnections] = &myRooms[i];
+
+									}
+								}
+
+								myRooms[index].numConnections++;
+							}
+						}//wnd of while loop
+					}//end of file loop
+					fclose(myFile);
+		}//END OF 2ND FOR LOOP
+
+	}
+
+
+	timeThread(){
+		// unlock mutex to activate 2nd thread call to getTime
+					pthread_mutex_unlock(&mutex);
+					// return to main thread, end 2nd thread
+					pthread_join(tid[0], NULL);
+					// lock mutex for main thread
+					pthread_mutex_lock(&mutex);
+					// recreate 2nd thread for subsequent "time" requests
+			pthread_create(&(tid[0]), NULL, &getTime, NULL);
+		}
+/************************************************************************
+*************************************************************************
+*************************************************************************
+*************************************************************************
+***********													  ***********
+****						  MAIN() 								  ***
+***********													  ***********
+*************************************************************************
+*************************************************************************
+*************************************************************************
+************************************************************************/
+int main(){
+	initializeMutex();
+	initializeRooms();
+
+	int i, j, k;
+	char myRoomDir[MAX_CHARS];
+	memset(myRoomDir, '\0', sizeof(myRoomDir));
+	struct dirent * ent;
+
+	getMostRecentDir(myRoomDir, ent);
+
 
 	//printf("%s", myRoomDir);
 
 
-	int mf = 0;
-	int myRoomsCounter = 0;
-	int myConnectionsCounter = 0;
-	char myFileArray[50][50];
+	//char myFileArray[MAX_ROOMS][MAX_CHARS];
 	int mfaCount = 0;
 	DIR * myDir;
 	myDir = opendir(myRoomDir);
 	if (myDir){
 		readdir(myDir);
-	//	readdir(myDir);
 		while((ent = readdir(myDir)) != NULL){
 			//omit files that
 				if(ent->d_name[0] != '.'){
@@ -297,113 +421,26 @@ int main(){
 					mfaCount++;
 				}
 		}
-		char cwdir[100] = {'\0'};
-		getcwd(cwdir, 100);
-		//  directory is still open, open each file and info to struct
-		FILE * myFile;
-		char line[100];
-		int arr;
-		char result[MAX_FILEPATH];// = (char*)malloc(50 * sizeof(char));
 
-		char firstArg[20];
-		char secondArg[20];
-		char thirdArg[20];
-		char roomArray[7][20];
-		int roomCounter = 0;
-		// for each file in the directory
-		for(arr = 0; arr < MAX_ROOMS; arr++){
-			memset(result, '\0', sizeof(result));
-			strcat(result, "./");
-			strcat(result, myRoomDir);
-			strcat(result, "/");
-			strcat(result, myFileArray[arr]);
+		//  directory is still open, open each file and assign room struct
+		createRooms(myRoomDir);
 
-			if(	myFile = fopen(result, "r"))
-			{
-				while(fgets(line, sizeof(line), myFile) != NULL)
-				{
-					memset(thirdArg, '\0', sizeof(thirdArg));
-					memset(secondArg, '\0', sizeof(secondArg));
-					memset(firstArg, '\0', sizeof(firstArg));
-
-					sscanf(line, "%s %s %s", firstArg, secondArg, thirdArg);
-
-				//	arg = *thirdArg;
-					if (strcmp(secondArg, "NAME:") == 0){
-						//create room
-						strcpy(myRooms[roomCounter].name, thirdArg);
-						//add to room array
-						fflush(stdout);
-						roomCounter++;
-					}
-					if (strcmp(secondArg, "TYPE:") == 0){
-						strcpy(myRooms[arr].roomType, thirdArg);
-						if(strcmp(thirdArg, "START_ROOM") == 0){
-							visitedRooms[0].currentRoom = arr;
-						}
-					}
-
-				}
-			}
-			fclose(myFile);
-			//free(result);
-
-		}//end of first for loop to loop through all files
-
-		// for each file in the directory
-		for(arr = 0; arr < MAX_ROOMS; arr++){
-			memset(result, '\0', sizeof(result));
-			strcat(result, "./");
-			strcat(result, myRoomDir);
-			strcat(result, "/");
-			strcat(result, myFileArray[arr]);
-
-			if(	myFile = fopen(result, "r"))
-			{
-				while(fgets(line, sizeof(line), myFile) != NULL)
-				{
-					memset(thirdArg, '\0', sizeof(thirdArg));
-					memset(secondArg, '\0', sizeof(secondArg));
-					memset(firstArg, '\0', sizeof(firstArg));
-
-					sscanf(line, "%s %s %s", firstArg, secondArg, thirdArg);
-					if(strcmp(firstArg, "CONNECTION") == 0){
-						//get struct from room name in thirdArg
-						for (i = 0; i < MAX_ROOMS; i++){
-							if (strcmp(thirdArg, myRooms[i].name) == 0){
-								myRooms[arr].connectedRooms[myRooms[arr].numConnections] = &myRooms[i];
-
-							}
-						}
-
-						myRooms[arr].numConnections++;
-					}
-				}//wnd of while loop
-			}//end of file loop
-			fclose(myFile);
-		}//END OF 2ND FOR LOOP
 	}
-	char possibleConnections[MAX_FILEPATH];// = (char*)malloc(100 * sizeof(char));
-	char userEntry[MAX_FILEPATH];// = (char*)malloc(100 * sizeof(char));
-	char userEntry2[MAX_FILEPATH];// = (char*)malloc(100 * sizeof(char));
+	closedir(myDir);//close directory
+
+	char possibleConnections[MAX_CHARS];
+	char userEntry[MAX_CHARS];
+	char userEntry2[MAX_CHARS];
 	int gameOver = 1;
 	FILE * timeFP;
-	char buffer[80];
-	char buffer1[80];
-	char fileName[MAX_FILEPATH];// = "time.txt";
+	char buffer1[MAX_CHARS];
+	char fileName[MAX_FILEPATH];
 	strcpy(fileName, "time.txt");
-	int result_code;
 	while (gameOver == 1){
 		printPossibleConnections(possibleConnections, userEntry);
 		while(strcmp(userEntry, "time") == 0){
-			// unlock mutex to activate 2nd thread call to getTime
-			pthread_mutex_unlock(&mutex);
-			// return to main thread, end 2nd thread
-			pthread_join(tid[0], NULL);
-			// lock mutex for main thread
-			pthread_mutex_lock(&mutex);
-			// recreate 2nd thread for subsequent "time" requests
-			pthread_create(&(tid[0]), NULL, &getTime, NULL);
+			timeThread();
+
 			// open file to read from to
 			memset(buffer1,'\0', sizeof(buffer1));
 			timeFP = fopen(fileName,"r");
