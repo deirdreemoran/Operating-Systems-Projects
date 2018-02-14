@@ -79,11 +79,11 @@ struct visited
 ************************************************************************/
 void whereToPrompt(char * userEntry)
 {
-		printf("WHERE TO? >");
-		//fflush(stdout);
-		fflush(stdin);
-		//fgets(possibleConnections, sizeof(possibleConnections), stdin);
-		scanf("%s", userEntry);
+	printf("WHERE TO? >");
+	//fflush(stdout);
+	fflush(stdin);
+	//fgets(possibleConnections, sizeof(possibleConnections), stdin);
+	scanf("%s", userEntry);
 }
 
 
@@ -97,26 +97,23 @@ void whereToPrompt(char * userEntry)
 ************************************************************************/
 void printPossibleConnections(char * possibleConnections, char * userEntry)
 {
-		int i;
-		// Set current room variable and print current room name
-		int currentRoom = visitedRooms[0].currentRoom;
-		printf("\nCURRENT LOCATION: %s \n", myRooms[currentRoom].name);
-
-		// Format and print all possible connecting rooms
-		memset(possibleConnections, '\0', sizeof(possibleConnections));
-		for(i = 0; i < myRooms[currentRoom].numConnections - 1; i++){
-			strcat(possibleConnections, myRooms[currentRoom].connectedRooms[i]->name);
-			strcat(possibleConnections, ", ");
-		}
+	int i;
+	// Set current room variable and print current room name
+	int currentRoom = visitedRooms[0].currentRoom;
+	printf("\nCURRENT LOCATION: %s \n", myRooms[currentRoom].name);
+	// Format and print all possible connecting rooms
+	memset(possibleConnections, '\0', sizeof(possibleConnections));
+	for(i = 0; i < myRooms[currentRoom].numConnections - 1; i++){
 		strcat(possibleConnections, myRooms[currentRoom].connectedRooms[i]->name);
-		strcat(possibleConnections, ".");
-		printf("POSSIBLE CONNECTIONS: %s\n", possibleConnections);
-
-		// Clear the buffer for next time
-		memset(possibleConnections, '\0', sizeof(possibleConnections));
-
-		// Pass buffer to print Where-to prompt function
-		whereToPrompt(userEntry);
+		strcat(possibleConnections, ", ");
+	}
+	strcat(possibleConnections, myRooms[currentRoom].connectedRooms[i]->name);
+	strcat(possibleConnections, ".");
+	printf("POSSIBLE CONNECTIONS: %s\n", possibleConnections);
+	// Clear the buffer for next time
+	memset(possibleConnections, '\0', sizeof(possibleConnections));
+	// Pass buffer to print Where-to prompt function
+	whereToPrompt(userEntry);
 }
 
 
@@ -131,68 +128,66 @@ void printPossibleConnections(char * possibleConnections, char * userEntry)
 ************************************************************************/
 int compareEntry(char * userEntry, char * userEntry2)
 {
-		char buffer[256];
-		int currentRoom = visitedRooms[0].currentRoom;
+	char buffer[256];
+	int currentRoom = visitedRooms[0].currentRoom;
+	int notConnected = 0;
+	int newCurrentRoom;
+	int errorMarker = currentRoom;
+	int i;
+	int stepCounter = visitedRooms[0].stepCount;
 
-		int notConnected = 0;
-		int newCurrentRoom;
-		int errorMarker = currentRoom;
-		int i;
-		int stepCounter = visitedRooms[0].stepCount;
-
-		// If user enters time, return to main for time command
-		if(strcmp(userEntry, "time") == 0){
-			return 1;
+	// If user enters time, return to main for time command
+	if(strcmp(userEntry, "time") == 0){
+		return 1;
+	}
+	// Check that userEntry is a room connected to current room
+	for (i = 0; i < myRooms[currentRoom].numConnections; i++){
+		if(strcmp(userEntry, myRooms[currentRoom].connectedRooms[i]->name) == 0){
+			notConnected++;
 		}
+	}
 
-		// Check that userEntry is a room connected to current room
-		for (i = 0; i < myRooms[currentRoom].numConnections; i++){
-			if(strcmp(userEntry, myRooms[currentRoom].connectedRooms[i]->name) == 0){
-				notConnected++;
-			}
-		}
+	// If user Entry is not a connected room, print error message and return to main
+	if(notConnected == 0){
+		memset(userEntry, '\0', sizeof(userEntry));
+		memset(userEntry2, '\0', sizeof(userEntry2));
+		memset(buffer, '\0', sizeof(buffer));
+		printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n");
+		return 1;
+	}
 
-		// If user Entry is not a connected room, print error message and return to main
-		if(notConnected == 0){
-			memset(userEntry, '\0', sizeof(userEntry));
-			memset(userEntry2, '\0', sizeof(userEntry2));
-			memset(buffer, '\0', sizeof(buffer));
-			printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n");
-			return 1;
+	// Get room index of userEntry, store in newCurrentRoom
+	for (i = 0; i < MAX_ROOMS; i++){
+		if (strcmp(userEntry, myRooms[i].name) == 0){
+			newCurrentRoom = i;
 		}
+	}
 
-		// Get room index of userEntry, store in newCurrentRoom
-		for (i = 0; i < MAX_ROOMS; i++){
-			if (strcmp(userEntry, myRooms[i].name) == 0){
-				newCurrentRoom = i;
-			}
-		}
+	// If user newCurrentRoom is NOT the end room, make this currentRoom
+	if (strcmp(myRooms[newCurrentRoom].roomType, "END_ROOM") != 0){
+		// Add room to visitedRooms array, increase stepCount
+		visitedRooms[0].stepRooms[visitedRooms[0].stepCount] = &myRooms[newCurrentRoom];
+		visitedRooms[0].stepCount++;
+		// Set newCurrentRoom and currentRoom
+		visitedRooms[0].currentRoom = newCurrentRoom;
+		// Clear userEntry buffers
+		memset(userEntry, '\0', sizeof(userEntry));
+		memset(userEntry2, '\0', sizeof(userEntry));
+		return 1;
+	}
 
-		// If user newCurrentRoom is NOT the end room, make this currentRoom
-		if (strcmp(myRooms[newCurrentRoom].roomType, "END_ROOM") != 0){
-			// Add room to visitedRooms array, increase stepCount
-			visitedRooms[0].stepRooms[visitedRooms[0].stepCount] = &myRooms[newCurrentRoom];
-			visitedRooms[0].stepCount++;
-			// Set newCurrentRoom and currentRoom
-			visitedRooms[0].currentRoom = newCurrentRoom;
-			// Clear userEntry buffers
-			memset(userEntry, '\0', sizeof(userEntry));
-			memset(userEntry2, '\0', sizeof(userEntry));
-			return 1;
+	// If user newCurrentRoom IS the end room, display congratulation message and print
+	// number of steps and rooms visited, return to main with gameOver set to True
+	if (strcmp(myRooms[newCurrentRoom].roomType, "END_ROOM") == 0){
+		visitedRooms[0].stepRooms[visitedRooms[0].stepCount] = &myRooms[newCurrentRoom];
+		visitedRooms[0].stepCount++;
+		printf("\nYOU HAVE FOUND THE END ROOM. CONGRATULATIONS!\n");
+		printf("YOU TOOK %d STEPS. YOUR PATH TO VICTORY WAS:\n", visitedRooms[0].stepCount );
+		for (i = 0; i < visitedRooms[0].stepCount; i++){
+			printf("%s\n", visitedRooms[0].stepRooms[i]->name);
 		}
-
-		// If user newCurrentRoom IS the end room, display congratulation message and print
-		// number of steps and rooms visited, return to main with gameOver set to True
-		if (strcmp(myRooms[newCurrentRoom].roomType, "END_ROOM") == 0){
-			visitedRooms[0].stepRooms[visitedRooms[0].stepCount] = &myRooms[newCurrentRoom];
-			visitedRooms[0].stepCount++;
-			printf("\nYOU HAVE FOUND THE END ROOM. CONGRATULATIONS!\n");
-			printf("YOU TOOK %d STEPS. YOUR PATH TO VICTORY WAS:\n", visitedRooms[0].stepCount );
-			for (i = 0; i < visitedRooms[0].stepCount; i++){
-				printf("%s\n", visitedRooms[0].stepRooms[i]->name);
-			}
-			return 0;
-		}
+		return 0;
+	}
 }
 
 
@@ -206,34 +201,32 @@ int compareEntry(char * userEntry, char * userEntry2)
 ************************************************************************/
 void * getTime(void * passed_in_value)
 {
-		// lock the mutex in current thread
-		pthread_mutex_lock(&mutex);
+	// lock the mutex in current thread
+	pthread_mutex_lock(&mutex);
+	// empty buffer and create filepath for writing time
+	char buffer[MAX_CHARS];
+	memset(buffer,'\0', sizeof(buffer));
+	FILE * timeFP;
+	char fileName[MAX_FILEPATH];
+	memset(fileName, '\0', sizeof(fileName));
+	strcpy(fileName, "currentTime.txt");
+	// get the current time and store in structure
+	time_t currentTime;
+	struct tm * info;
+	time(&currentTime);
+	info = localtime(&currentTime);
+	// write formatted time to buffer
+	strftime(buffer, MAX_CHARS, "%l:%M%P, %A, %B %d, %Y", info);
 
-		// empty buffer and create filepath for writing time
-		char buffer[MAX_CHARS];
-		memset(buffer,'\0', sizeof(buffer));
-		FILE * timeFP;
-		char fileName[MAX_FILEPATH];
-		memset(fileName, '\0', sizeof(fileName));
-		strcpy(fileName, "currentTime.txt");
-
-		// get the current time and store in structure
-		time_t currentTime;
-		struct tm * info;
-		time(&currentTime);
-		info = localtime(&currentTime);
-		// write formatted time to buffer
-		strftime(buffer, MAX_CHARS, "%l:%M%P, %A, %B %d, %Y", info);
-
-		// open file to write to
-		timeFP = fopen(fileName, "w");
-		// print time to file
-		fprintf(timeFP,"%s\n", buffer);
-		// close file
-		fclose(timeFP);
-		// Unlock the mutex
-		pthread_mutex_unlock(&mutex);
-		return(NULL);
+	// open file to write to
+	timeFP = fopen(fileName, "w");
+	// print time to file
+	fprintf(timeFP,"%s\n", buffer);
+	// close file
+	fclose(timeFP);
+	// Unlock the mutex
+	pthread_mutex_unlock(&mutex);
+	return(NULL);
 }
 
 
@@ -247,12 +240,12 @@ void * getTime(void * passed_in_value)
 ************************************************************************/
 void initializeMutex()
 {
-		// initialize mutex
-		pthread_mutex_init(&mutex, NULL);
-		// lock mutex in main thread
-		pthread_mutex_lock(&mutex);
-		// create POSIX thread, will execute when mutex is unlocked
-		pthread_create(&(tid[0]), NULL, &getTime, (void*)NULL);
+	// initialize mutex
+	pthread_mutex_init(&mutex, NULL);
+	// lock mutex in main thread
+	pthread_mutex_lock(&mutex);
+	// create POSIX thread, will execute when mutex is unlocked
+	pthread_create(&(tid[0]), NULL, &getTime, (void*)NULL);
 }
 
 
