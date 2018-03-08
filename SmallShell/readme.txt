@@ -1,0 +1,5 @@
+
+To compile smallsh.c:
+In command line, enter:    gcc -o smallsh smallsh.c
+
+To run, enter:    smallsh
