@@ -36,7 +36,7 @@ tempLineB="tempLineB$$"
 function perror(){
 	# NAME
 	#   perror - print a stack trace and error message
-	# SYNOPSIS
+	# SYNOPSIS 
 	#   perror [STRING]
 	# DESCRIPTION
 	#   Echoes the STRING(s) to standard error.
