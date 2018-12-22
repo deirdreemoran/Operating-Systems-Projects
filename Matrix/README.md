@@ -8,9 +8,9 @@ A bash shell script for computing matrix operations.
 - [X] Adds and multiplies two matrices (add or multiply)
 
 ### To Run  
-* [MATRIX] is the filename that contains a matrix (i.e. files 'm1' 'm2' etc. above)
-matrix dims [MATRIX]
-matrix transpose [MATRIX]
-matrix mean [MATRIX]
-matrix add MATRIX_LEFT MATRIX_RIGHT
-matrix multiply MATRIX_LEFT MATRIX_RIGHT
+matrix dims [MATRIX]\
+matrix transpose [MATRIX]\
+matrix mean [MATRIX]\
+matrix add MATRIX_LEFT MATRIX_RIGHT\
+matrix multiply MATRIX_LEFT MATRIX_RIGHT\
+*\[MATRIX] is the filename that contains a matrix (i.e. files 'm1' 'm2' etc. above)
