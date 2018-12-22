@@ -1,6 +1,6 @@
-# Matrix Operations
+### Matrix Operations
 ***
-[-] Prints dimensions of matrix
-[-] Transposes a matrix
-[-] Calculates mean vector of a matrix
-[-] Adds and multiplies two matrices
+- [X] Prints dimensions of matrix
+- [X] Transposes a matrix
+- [X] Calculates mean vector of a matrix
+- [X] Adds and multiplies two matrices
