@@ -20,5 +20,4 @@ $ compileall\
 $ otp_dec_d [port2] &\
 $ keygen [number of characters] > mykey\
 $ otp_enc myplaintext mykey [port1] > myciphertext\
-$ otp_dec myciphertext mykey [port2] > decrypted_message\
-
+$ otp_dec myciphertext mykey [port2] > decrypted_message
