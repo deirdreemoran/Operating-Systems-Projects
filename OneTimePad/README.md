@@ -16,7 +16,7 @@ decrypted_message: decrypted message\
 
 ### Usage
 $ compileall\
-% otp_enc_d [port1] &\
+$ otp_enc_d [port1] &\
 $ otp_dec_d [port2] &\
 $ keygen [number of characters] > mykey\
 $ otp_enc myplaintext mykey [port1] > myciphertext\
