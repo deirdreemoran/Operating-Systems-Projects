@@ -12,7 +12,7 @@ compileall: bash script for compilation\
 plaintext: message to encrypt\
 mykey: encrypted key\
 myciphertext: encrypted message\
-decrypted_message: decrypted message\
+decrypted_message: decrypted message
 
 ### Usage
 $ compileall\
