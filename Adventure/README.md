@@ -1,4 +1,5 @@
-#Simple text adventure game.  
+# Simple text adventure game.  
+***
 See how many steps it takes to travel from starting room to end room.
 
 To compile and run: 
