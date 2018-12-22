@@ -1,4 +1,4 @@
-## Matrix 
+# Matrix 
 A bash shell script for computing matrix operations. 
 ***
 ### Operations
@@ -8,7 +8,7 @@ A bash shell script for computing matrix operations.
 - [X] Adds and multiplies two matrices (add or multiply)
 
 ### To Run  
-NOTE: *\[MATRIX] is the filename that contains a matrix (i.e. files 'm1' 'm2' etc. above)
+NOTE: *\[MATRIX] is the filename that contains a matrix (i.e. files 'm1' 'm2' etc. above)\
 matrix dims [MATRIX]\
 matrix transpose [MATRIX]\
 matrix mean [MATRIX]\
