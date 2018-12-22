@@ -1,4 +1,4 @@
-Five small programs that encrypt and decrypt information using a one-time pad-like system.
+Encrypts and decrypts messages using a one-time pad-like system.
 
 keygen.c:  generates a key of specified size
 otp_dec_d.c:   decoding server
