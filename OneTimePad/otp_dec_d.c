@@ -34,8 +34,6 @@
 *********************************************************************************/
 int getSize(int socketFD2)
 {
-				printf("IN GET SIZE");
-
 	char fSize[20];
 	memset(fSize, '\0', sizeof(fSize));
 	// Get the file size
